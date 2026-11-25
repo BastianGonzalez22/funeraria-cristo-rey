@@ -64,4 +64,6 @@
         @endif
     </div>
 </div>
+
+@include('portal._seguimiento', ['s' => $s])
 @endsection

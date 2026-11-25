@@ -72,7 +72,7 @@ class PortalController extends Controller
     {
         $this->autorizar($request, $solicitud);
 
-        return view('portal.show', ['s' => $solicitud->load(['urna', 'unidad', 'sucursal', 'contrato.abonos', 'asignacion', 'condolencias'])]);
+        return view('portal.show', ['s' => $solicitud->load(['urna', 'unidad', 'sucursal', 'contrato.abonos', 'asignacion.vehiculo', 'asignacion.chofer', 'condolencias'])]);
     }
 
     public function edit(Request $request, Solicitud $solicitud)
