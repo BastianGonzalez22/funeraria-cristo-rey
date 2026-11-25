@@ -478,3 +478,7 @@ body.publico > .pub-footer { margin-top: 0; }
 .seg-pasos li:not(.hecho):not(.actual) .seg-t { color: var(--muted, #8a8178); }
 .seg-lista { margin: 4px 0 0; padding-left: 18px; font-size: 13px; }
 .seg-lista li { margin-bottom: 3px; }
+
+/* Flota: día elegido en el selector de fecha */
+.semana th.dia-elegido { color: var(--accent-dark); }
+.semana td.dia-elegido, .semana th.dia-elegido { background: var(--accent-soft); }

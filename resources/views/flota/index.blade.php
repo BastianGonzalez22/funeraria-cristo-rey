@@ -14,18 +14,18 @@
                 <a href="{{ route('flota.index', ['semana' => $lunes->copy()->subWeek()->toDateString()]) }}" class="btn btn-outline btn-sm">‹ Anterior</a>
                 <a href="{{ route('flota.index') }}" class="btn btn-outline btn-sm">Hoy</a>
                 <a href="{{ route('flota.index', ['semana' => $lunes->copy()->addWeek()->toDateString()]) }}" class="btn btn-outline btn-sm">Siguiente ›</a>
-                <form method="GET" class="inline"><input class="input" type="date" name="semana" value="{{ $lunes->toDateString() }}" onchange="this.form.submit()" style="width:150px;padding:4px 8px" title="Ir a la semana de…"></form>
+                <form method="GET" class="inline"><input class="input" type="date" name="semana" value="{{ $elegido->toDateString() }}" onchange="this.form.submit()" style="width:150px;padding:4px 8px" title="Ir a la semana de…"></form>
             </div>
         </div>
         <div class="card-body p0 tabla-wrap">
             <table class="tabla semana">
-                <thead><tr><th>Vehículo</th>@foreach ($dias as $d)<th class="{{ $d->isToday() ? 'strong' : '' }}">{{ $d->translatedFormat('D d') }}</th>@endforeach</tr></thead>
+                <thead><tr><th>Vehículo</th>@foreach ($dias as $d)<th class="{{ $d->isToday() ? 'strong' : '' }} {{ $d->isSameDay($elegido) ? 'dia-elegido' : '' }}">{{ $d->translatedFormat('D d') }}</th>@endforeach</tr></thead>
                 <tbody>
                 @foreach ($vehiculos as $v)
                     <tr>
                         <td><span class="strong">{{ $v->nombre }}</span><div class="xs muted">{{ $v->patente }} @if($v->estado === 'en_mantencion')· <span class="text-bad">mantención</span>@endif</div></td>
                         @foreach ($dias as $d)
-                            <td>
+                            <td class="{{ $d->isSameDay($elegido) ? 'dia-elegido' : '' }}">
                                 @forelse ($matriz[$v->id][$d->toDateString()] ?? [] as $a)
                                     <a href="{{ route('solicitudes.show', $a->solicitud_id) }}" class="celda-ocupada {{ $a->estado === 'completada' ? 'ok' : '' }}" title="{{ $a->solicitud->cliente->nombre_familia }} ({{ $a->solicitud->cliente->nombre_contratante }}) · {{ $a->chofer->nombre }}">
                                         {{ $a->inicio->isSameDay($d) ? $a->inicio->format('H:i') : '…' }} {{ \Illuminate\Support\Str::limit(str_replace('Familia ', '', $a->solicitud->cliente->nombre_familia), 10) }}
@@ -40,7 +40,7 @@
                 <tr>
                     <td><span class="strong">Choferes ausentes</span></td>
                     @foreach ($dias as $d)
-                        <td class="xs">
+                        <td class="xs {{ $d->isSameDay($elegido) ? 'dia-elegido' : '' }}">
                             @foreach ($choferes as $ch)
                                 @if ($ch->ausenteEl($d))<div class="text-bad">{{ $ch->nombreCorto() }}</div>@endif
                             @endforeach

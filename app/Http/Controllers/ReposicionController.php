@@ -20,8 +20,10 @@ class ReposicionController extends Controller
 
     public function index()
     {
-        $urnas = Urna::with('proveedor')->where('bajo_pedido', false)->orderBy('codigo')->get();
-        $porReponer = $urnas->filter(fn ($u) => in_array($u->estado, ['reponer', 'en_umbral'], true))
+        // Todas las urnas se pueden registrar al llegar (también las personalizadas fabricadas a pedido);
+        // la lista "Pendiente de reponer" solo considera las de stock normal.
+        $urnas = Urna::with('proveedor')->orderBy('bajo_pedido')->orderBy('codigo')->get();
+        $porReponer = $urnas->where('bajo_pedido', false)->filter(fn ($u) => in_array($u->estado, ['reponer', 'en_umbral'], true))
             ->map(function ($u) {
                 $u->sugerido = max(1, $u->stock_minimo * 2 - $u->disponible());
 

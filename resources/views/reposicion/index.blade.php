@@ -49,7 +49,7 @@
                 @csrf
                 <div class="campo mb-2"><label>Modelo *</label>
                     <select class="input" name="urna_id" required>
-                        @foreach ($urnas as $u)<option value="{{ $u->id }}" @selected(old('urna_id') == $u->id)>{{ $u->codigo }} {{ $u->modelo }} ({{ $u->disponible() }} disp.)</option>@endforeach
+                        @foreach ($urnas as $u)<option value="{{ $u->id }}" @selected(old('urna_id', request('urna')) == $u->id)>{{ $u->codigo }} {{ $u->modelo }} ({{ $u->disponible() }} disp.{{ $u->bajo_pedido ? ' · personalizada / a pedido' : '' }})</option>@endforeach
                     </select></div>
                 <div class="campo mb-2"><label>Proveedor</label>
                     <select class="input" name="proveedor_id"><option value="">—</option>

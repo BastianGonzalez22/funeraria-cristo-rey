@@ -20,7 +20,9 @@ class FlotaController extends Controller
 
     public function index(Request $request)
     {
-        $lunes = Carbon::parse($request->query('semana', now()->toDateString()))->startOfWeek(Carbon::MONDAY);
+        // La fecha elegida se mantiene (y se destaca); la grilla siempre muestra su semana de lunes a domingo
+        $elegido = Carbon::parse($request->query('semana', now()->toDateString()))->startOfDay();
+        $lunes = $elegido->copy()->startOfWeek(Carbon::MONDAY);
         $dias = collect(range(0, 6))->map(fn ($i) => $lunes->copy()->addDays($i));
 
         $pendientes = Solicitud::with(['cliente', 'asignacion'])
@@ -31,6 +33,7 @@ class FlotaController extends Controller
 
         return view('flota.index', [
             'lunes' => $lunes,
+            'elegido' => $elegido,
             'dias' => $dias,
             'vehiculos' => Vehiculo::orderByRaw("CASE tipo WHEN 'carroza' THEN 0 WHEN 'instalacion' THEN 1 ELSE 2 END")->orderBy('nombre')->get(),
             'choferes' => Chofer::with('ausencias')->orderBy('nombre')->get(),
