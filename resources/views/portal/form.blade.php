@@ -64,7 +64,8 @@
                     <div class="campo"><label>Cementerio o crematorio</label>
                         <input class="input" name="cementerio_crematorio" value="{{ old('cementerio_crematorio', $solicitud->cementerio_crematorio) }}"></div>
                     <div class="campo"><label>Misa / ceremonia (hora)</label>
-                        <input class="input" type="datetime-local" name="misa_hora" value="{{ old('misa_hora', $dt($solicitud->misa_hora)) }}"></div>
+                        <input class="input" type="datetime-local" name="misa_hora" value="{{ old('misa_hora', $dt($solicitud->misa_hora)) }}">
+                        <div class="ayuda">Dentro de los 3 días del servicio.</div>@error('misa_hora')<div class="error">{{ $message }}</div>@enderror</div>
                     <div class="campo full"><label class="check"><input type="checkbox" name="fuera_comuna" value="1" @checked(old('fuera_comuna', $solicitud->fuera_comuna))> La sepultura es fuera de Temuco (requiere permiso de traslado)</label>
                         <input class="input mt-1" name="comuna_destino" value="{{ old('comuna_destino', $solicitud->comuna_destino) }}" placeholder="Comuna de destino"></div>
                 </div>

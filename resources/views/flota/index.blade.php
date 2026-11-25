@@ -68,7 +68,46 @@
 <div class="card" id="asignar">
     <div class="card-header"><h2>Asignar vehículo a servicio</h2><span class="meta">{{ $pendientes->whereNull('asignacion')->count() }} servicio(s) aprobado(s) sin flota</span></div>
     <div class="card-body">
-        @php $sel = $seleccionada; $asig = $sel?->asignacion; @endphp
+        @php
+            $sel = $seleccionada; $asig = $sel?->asignacion;
+            // Propuesta armada con los datos que ingresó la familia / el registrador en la solicitud
+            $sug = null;
+            if ($sel) {
+                $etq = fn ($f, $txt) => $f && ! $f->isSameDay($sel->fecha_hora) ? $txt.' ('.$f->format('d/m').')' : $txt;
+                $sug = [
+                    'inicio' => $sel->fecha_hora->copy()->subHour()->format('Y-m-d\TH:i'),
+                    'fin' => $sel->fecha_hora->copy()->addHours(3)->format('Y-m-d\TH:i'),
+                    'origen' => $sel->lugar_retiro ?: $sel->lugar_velatorio,
+                    'destino' => $sel->cementerio_crematorio,
+                    'paradas' => array_values(array_filter([
+                        $sel->lugar_retiro && $sel->lugar_velatorio ? ['hora' => $sel->fecha_hora->copy()->subHour()->format('H:i'), 'lugar' => 'Retiro', 'direccion' => $sel->lugar_retiro] : null,
+                        $sel->lugar_velatorio ? ['hora' => $sel->fecha_hora->format('H:i'), 'lugar' => 'Velatorio', 'direccion' => $sel->lugar_velatorio] : null,
+                        $sel->misa_lugar ? ['hora' => $sel->misa_hora?->format('H:i'), 'lugar' => $etq($sel->misa_hora, 'Misa / ceremonia'), 'direccion' => $sel->misa_lugar] : null,
+                        $sel->cementerio_crematorio ? ['hora' => $sel->sepultura_hora?->format('H:i'), 'lugar' => $etq($sel->sepultura_hora, 'Cementerio / crematorio'), 'direccion' => $sel->cementerio_crematorio] : null,
+                    ])),
+                ];
+            }
+            $desfasada = $asig && $sel && abs($asig->inicio->diffInMinutes($sel->fecha_hora)) > 6 * 60;
+            $otroDia = $sel && collect([$sel->misa_hora, $sel->sepultura_hora])->filter()->contains(fn ($f) => ! $f->isSameDay($sel->fecha_hora));
+        @endphp
+        @if ($sel)
+            <div class="aviso aviso-info">
+                <strong>Datos del servicio ingresados en la solicitud:</strong>
+                {{ fecha_hora($sel->fecha_hora) }}
+                @if ($sel->lugar_retiro) · Retiro: {{ $sel->lugar_retiro }}@endif
+                @if ($sel->lugar_velatorio) · Velatorio: {{ $sel->lugar_velatorio }}@endif
+                @if ($sel->misa_lugar) · Misa: {{ $sel->misa_lugar }}{{ $sel->misa_hora ? ' ('.fecha_hora($sel->misa_hora).')' : '' }}@endif
+                @if ($sel->cementerio_crematorio) · Destino: {{ $sel->cementerio_crematorio }}{{ $sel->sepultura_hora ? ' ('.fecha_hora($sel->sepultura_hora).')' : '' }}@endif
+                <div class="mt-1"><button type="button" class="btn btn-outline btn-xs" data-cargar-servicio='@json($sug)'>Usar datos del servicio</button>
+                    <span class="small">El formulario ya viene con estos datos; use el botón para volver a cargarlos si los cambió.</span></div>
+            </div>
+            @if ($desfasada)
+                <div class="aviso aviso-warn">La asignación guardada ({{ fecha_hora($asig->inicio) }}) no coincide con la fecha del servicio ({{ fecha_hora($sel->fecha_hora) }}). Presione <strong>Usar datos del servicio</strong> y guarde para corregirla.</div>
+            @endif
+            @if ($otroDia)
+                <div class="aviso aviso-warn">La misa o la sepultura están en otro día que el servicio. Revise las horas de la hoja de ruta: la parada muestra la fecha entre paréntesis.</div>
+            @endif
+        @endif
         <form method="POST" action="{{ route('flota.asignar') }}">
             @csrf
             <div class="form-grid cols-3">
@@ -92,11 +131,11 @@
                         @endforeach
                     </select></div>
                 <div class="campo"><label>Inicio *</label>
-                    <input class="input" type="datetime-local" name="inicio" required value="{{ old('inicio', ($asig?->inicio ?? $sel?->fecha_hora?->copy()->subHour())?->format('Y-m-d\TH:i')) }}"></div>
+                    <input class="input" type="datetime-local" name="inicio" data-campo-asig="inicio" required value="{{ old('inicio', $asig?->inicio?->format('Y-m-d\TH:i') ?? $sug['inicio'] ?? '') }}"></div>
                 <div class="campo"><label>Término *</label>
-                    <input class="input" type="datetime-local" name="fin" required value="{{ old('fin', ($asig?->fin ?? $sel?->fecha_hora?->copy()->addHours(3))?->format('Y-m-d\TH:i')) }}"></div>
-                <div class="campo"><label>Origen</label><input class="input" name="origen" value="{{ old('origen', $asig?->origen ?? $sel?->lugar_velatorio) }}" placeholder="Domicilio del velatorio"></div>
-                <div class="campo"><label>Destino</label><input class="input" name="destino" value="{{ old('destino', $asig?->destino ?? $sel?->cementerio_crematorio) }}" placeholder="Cementerio General de Temuco"></div>
+                    <input class="input" type="datetime-local" name="fin" data-campo-asig="fin" required value="{{ old('fin', $asig?->fin?->format('Y-m-d\TH:i') ?? $sug['fin'] ?? '') }}"></div>
+                <div class="campo"><label>Origen</label><input class="input" name="origen" data-campo-asig="origen" value="{{ old('origen', $asig?->origen ?? $sug['origen'] ?? '') }}" placeholder="Domicilio del velatorio"></div>
+                <div class="campo"><label>Destino</label><input class="input" name="destino" data-campo-asig="destino" value="{{ old('destino', $asig?->destino ?? $sug['destino'] ?? '') }}" placeholder="Cementerio General de Temuco"></div>
                 <div class="campo"><label>Notas para el chofer</label><input class="input" name="notas" value="{{ old('notas', $asig?->notas) }}" placeholder="Recorrido por lugar de trabajo, etc."></div>
             </div>
 
@@ -105,11 +144,7 @@
                 <thead><tr><th style="width:110px">Hora</th><th>Lugar</th><th>Dirección</th></tr></thead>
                 <tbody id="filas-ruta">
                 @php
-                    $paradas = old('hoja_ruta', $asig?->hoja_ruta ?: array_filter([
-                        $sel?->lugar_velatorio ? ['hora' => $sel->fecha_hora->format('H:i'), 'lugar' => 'Velatorio', 'direccion' => $sel->lugar_velatorio] : null,
-                        $sel?->misa_lugar ? ['hora' => $sel->misa_hora?->format('H:i'), 'lugar' => 'Misa / ceremonia', 'direccion' => $sel->misa_lugar] : null,
-                        $sel?->cementerio_crematorio ? ['hora' => $sel->sepultura_hora?->format('H:i'), 'lugar' => 'Cementerio / crematorio', 'direccion' => $sel->cementerio_crematorio] : null,
-                    ]));
+                    $paradas = old('hoja_ruta', $asig?->hoja_ruta ?: ($sug['paradas'] ?? []));
                     $paradas = array_values($paradas ?: [['hora' => '', 'lugar' => '', 'direccion' => '']]);
                 @endphp
                 @foreach ($paradas as $i => $p)

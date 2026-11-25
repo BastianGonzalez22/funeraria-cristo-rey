@@ -37,7 +37,10 @@ class FlotaController extends Controller
             'matriz' => $this->flota->semana($lunes),
             'ausencias' => AusenciaChofer::with('chofer')->where('estado', '!=', 'finalizada')->orderBy('desde')->get(),
             'pendientes' => $pendientes,
-            'seleccionada' => $request->query('solicitud') ? Solicitud::with('asignacion')->find($request->query('solicitud')) : null,
+            // Si no se eligió un servicio, se propone el próximo aprobado que aún no tiene vehículo
+            'seleccionada' => $request->query('solicitud')
+                ? Solicitud::with('asignacion')->find($request->query('solicitud'))
+                : $pendientes->first(fn ($p) => ! $p->asignacion),
         ]);
     }
 

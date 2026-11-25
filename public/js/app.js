@@ -253,3 +253,31 @@ document.querySelectorAll('input[type=file][data-previa-fondo]').forEach(functio
         if (input.files && input.files[0]) caja.style.backgroundImage = 'url(' + URL.createObjectURL(input.files[0]) + ')';
     });
 });
+
+// Flota: volver a cargar en el formulario los datos que se ingresaron en la solicitud
+(function () {
+    var btn = document.querySelector('[data-cargar-servicio]');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+        var d = JSON.parse(btn.getAttribute('data-cargar-servicio') || '{}');
+        ['inicio', 'fin', 'origen', 'destino'].forEach(function (k) {
+            var el = document.querySelector('[data-campo-asig="' + k + '"]');
+            if (el) el.value = d[k] || '';
+        });
+        var tbody = document.getElementById('filas-ruta');
+        if (!tbody) return;
+        var plantilla = tbody.querySelector('tr');
+        var paradas = (d.paradas && d.paradas.length) ? d.paradas : [{}];
+        tbody.innerHTML = '';
+        paradas.forEach(function (p, i) {
+            var fila = plantilla.cloneNode(true);
+            fila.querySelectorAll('input').forEach(function (el) {
+                el.name = el.name.replace(/\[\d+\]/, '[' + i + ']');
+                var campo = (el.name.match(/\[(\w+)\]$/) || [])[1];
+                el.value = p[campo] || '';
+            });
+            tbody.appendChild(fila);
+        });
+        btn.textContent = 'Datos cargados ✓';
+    });
+})();

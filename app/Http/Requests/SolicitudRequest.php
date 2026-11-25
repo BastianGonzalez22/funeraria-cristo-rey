@@ -70,6 +70,41 @@ class SolicitudRequest extends FormRequest
         return $reglas;
     }
 
+    /**
+     * La misa y la sepultura deben quedar dentro del servicio: no antes de su inicio
+     * ni más de 3 días después (el servicio dura 48 h, con posibilidad de extensión).
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($v) {
+            if ($v->errors()->hasAny(['fecha', 'hora', 'misa_hora', 'sepultura_hora'])) {
+                return;
+            }
+            try {
+                $inicio = Carbon::parse($this->input('fecha').' '.$this->input('hora'));
+            } catch (\Throwable) {
+                return;
+            }
+            $limite = $inicio->copy()->addHours((int) config('funeraria.duracion_servicio_horas', 48) + 24);
+            $misa = $this->filled('misa_hora') ? Carbon::parse($this->input('misa_hora')) : null;
+            $sepultura = $this->filled('sepultura_hora') ? Carbon::parse($this->input('sepultura_hora')) : null;
+
+            foreach (['misa_hora' => [$misa, 'La misa'], 'sepultura_hora' => [$sepultura, 'La sepultura o cremación']] as $campo => [$f, $nombre]) {
+                if (! $f) {
+                    continue;
+                }
+                if ($f->lt($inicio)) {
+                    $v->errors()->add($campo, "{$nombre} no puede ser antes del inicio del servicio ({$inicio->format('d/m/Y H:i')}).");
+                } elseif ($f->gt($limite)) {
+                    $v->errors()->add($campo, "{$nombre} debe ser dentro de los 3 días del servicio (a más tardar el {$limite->format('d/m/Y H:i')}). Revise la fecha.");
+                }
+            }
+            if ($misa && $sepultura && $sepultura->lt($misa)) {
+                $v->errors()->add('sepultura_hora', 'La sepultura o cremación no puede ser antes de la misa.');
+            }
+        });
+    }
+
     public function messages(): array
     {
         return [
