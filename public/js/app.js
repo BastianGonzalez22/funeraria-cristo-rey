@@ -281,3 +281,46 @@ document.querySelectorAll('input[type=file][data-previa-fondo]').forEach(functio
         btn.textContent = 'Datos cargados ✓';
     });
 })();
+
+// Cementerio o crematorio: la lista se filtra según el destino final (sepultura / cremación)
+(function () {
+    document.querySelectorAll('[data-lugar-destino]').forEach(function (sel) {
+        var form = sel.closest('form');
+        var texto = sel.parentNode.querySelector('[name="cementerio_crematorio"]');
+        var destino = form ? form.querySelector('[name="destino_final"]') : null;
+        var comuna = form ? form.querySelector('[name="comuna_destino"]') : null;
+        var ayuda = sel.parentNode.querySelector('[data-lugar-ayuda]');
+        var porDestino = { sepultura: 'cementerio', cremacion: 'crematorio' };
+
+        function filtrar() {
+            var tipo = destino ? porDestino[destino.value] : null;
+            var visibles = 0;
+            sel.querySelectorAll('optgroup').forEach(function (g) {
+                var hay = false;
+                g.querySelectorAll('option').forEach(function (o) {
+                    var ok = !tipo || o.getAttribute('data-tipo') === tipo;
+                    o.hidden = !ok; o.disabled = !ok;
+                    if (ok) { hay = true; visibles++; }
+                });
+                g.hidden = !hay;
+            });
+            var elegida = sel.options[sel.selectedIndex];
+            if (elegida && elegida.disabled) sel.value = '';
+            if (ayuda) {
+                ayuda.textContent = visibles
+                    ? 'Se muestran primero los ' + (tipo === 'crematorio' ? 'crematorios' : 'cementerios') + ' más cercanos a Temuco.'
+                    : 'No hay ' + (tipo === 'crematorio' ? 'crematorios' : 'cementerios') + ' registrados en la lista: escríbalo abajo.';
+            }
+        }
+
+        sel.addEventListener('change', function () {
+            if (sel.value === '__otro') { texto.value = ''; texto.focus(); return; }
+            if (!sel.value) return;
+            texto.value = sel.value;
+            var o = sel.options[sel.selectedIndex];
+            if (comuna && o.getAttribute('data-comuna')) comuna.value = o.getAttribute('data-comuna');
+        });
+        if (destino) destino.addEventListener('change', filtrar);
+        filtrar();
+    });
+})();

@@ -254,6 +254,9 @@ Route::middleware(['auth', 'activo'])->group(function () {
         Route::middleware('permiso:configuracion')->group(function () {
             Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
             Route::post('/configuracion', [ConfiguracionController::class, 'guardar'])->name('configuracion.guardar');
+            Route::post('/configuracion/lugares', [ConfiguracionController::class, 'guardarLugar'])->name('configuracion.lugares.guardar');
+            Route::patch('/configuracion/lugares/{lugar}', [ConfiguracionController::class, 'alternarLugar'])->name('configuracion.lugares.alternar');
+            Route::delete('/configuracion/lugares/{lugar}', [ConfiguracionController::class, 'eliminarLugar'])->name('configuracion.lugares.eliminar');
         });
     });
 });

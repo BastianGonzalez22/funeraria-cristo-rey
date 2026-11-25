@@ -69,7 +69,10 @@ class SolicitudService
         if ($solapadas->count() >= $this->capacidadSimultanea()) {
             $lista = $solapadas->map(fn ($s) => $s->cliente->nombre_familia.' ('.$s->fecha_hora->format('H:i').')')->implode(', ');
 
-            return 'El horario se solapa con otro servicio ya programado: '.$lista.'. Elija otro horario o coordine apoyo externo.';
+            $v = (int) config('funeraria.ventana_solapamiento_horas', 2);
+
+            return "Hay otro servicio que comienza a menos de {$v} horas ({$lista}) y no queda carroza propia libre. "
+                .'Elija otra hora ese mismo día o marque "Registrar aunque el horario se solape" para coordinar apoyo externo.';
         }
         if ($this->serviciosDelDia($fechaHora, $exceptoId) >= (int) config('funeraria.max_servicios_dia')) {
             return 'Ya existen '.config('funeraria.max_servicios_dia').' servicios ese día (capacidad máxima).';

@@ -1,6 +1,9 @@
 @if (session('ok'))
     <div class="aviso aviso-ok">{{ session('ok') }}</div>
 @endif
+@if (session('aviso'))
+    <div class="aviso aviso-warn">{{ session('aviso') }}</div>
+@endif
 @if (session('error'))
     <div class="aviso aviso-error">{{ session('error') }}</div>
 @endif

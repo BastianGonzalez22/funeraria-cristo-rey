@@ -31,7 +31,7 @@
                         @error('fecha')<div class="error">{{ $message }}</div>@enderror</div>
                     <div class="campo"><label>Hora solicitada *</label>
                         <input class="input" type="time" name="hora" required value="{{ old('hora', $solicitud->fecha_hora?->format('H:i') ?? '11:00') }}">
-                        <div class="ayuda">El sistema valida que el horario esté disponible.</div></div>
+                        <div class="ayuda">Si a esa hora ya hay otro servicio, la funeraria le confirmará el horario.</div></div>
                     <div class="campo"><label>Tipo de servicio *</label>
                         <select class="input" name="tipo_servicio" required>
                             @foreach (config('funeraria.tipos_servicio') as $k => $t)
@@ -62,7 +62,7 @@
                     <div class="campo"><label>Lugar del velatorio</label>
                         <input class="input" name="lugar_velatorio" value="{{ old('lugar_velatorio', $solicitud->lugar_velatorio) }}" placeholder="Domicilio o capilla"></div>
                     <div class="campo"><label>Cementerio o crematorio</label>
-                        <input class="input" name="cementerio_crematorio" value="{{ old('cementerio_crematorio', $solicitud->cementerio_crematorio) }}"></div>
+                        @include('partials.campo-destino', ['solicitud' => $solicitud])</div>
                     <div class="campo"><label>Misa / ceremonia (hora)</label>
                         <input class="input" type="datetime-local" name="misa_hora" value="{{ old('misa_hora', $dt($solicitud->misa_hora)) }}">
                         <div class="ayuda">Dentro de los 3 días del servicio.</div>@error('misa_hora')<div class="error">{{ $message }}</div>@enderror</div>

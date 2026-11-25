@@ -34,4 +34,45 @@
     </div>
     <div class="form-acciones"><a href="{{ route('login') }}" target="_blank" class="btn btn-outline" onclick="return confirm('Se abrirá el login en otra pestaña; como ya tiene sesión, puede redirigirlo al panel.')">Ver login</a><button class="btn btn-primary">Guardar</button></div>
 </form>
+
+<div class="card mt-3" id="lugares">
+    <div class="card-header"><h2>Cementerios y crematorios</h2><span class="meta">Se ofrecen en las solicitudes según el destino final</span></div>
+    <div class="card-body p0 tabla-wrap">
+        <table class="tabla">
+            <thead><tr><th>Tipo</th><th>Nombre</th><th>Dirección</th><th>Comuna</th><th>Cercanía</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            @forelse ($lugares as $l)
+                <tr class="{{ $l->activo ? '' : 'muted' }}">
+                    <td>{{ \App\Models\LugarDestino::TIPOS[$l->tipo] }}</td>
+                    <td class="strong">{{ $l->nombre }}</td>
+                    <td>{{ $l->direccion ?: '—' }}</td>
+                    <td>{{ $l->comuna }}</td>
+                    <td>{{ $l->orden }}</td>
+                    <td>@if ($l->activo)<span class="badge b-ok">Visible</span>@else<span class="badge b-neutral">Oculto</span>@endif</td>
+                    <td class="nowrap">
+                        <form method="POST" action="{{ route('configuracion.lugares.alternar', $l) }}" class="inline">@csrf @method('PATCH')<button class="btn btn-outline btn-xs">{{ $l->activo ? 'Ocultar' : 'Mostrar' }}</button></form>
+                        <form method="POST" action="{{ route('configuracion.lugares.eliminar', $l) }}" class="inline" data-confirmar="¿Eliminar {{ $l->nombre }} de la lista?">@csrf @method('DELETE')<button class="btn btn-danger btn-xs">×</button></form>
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="7" class="muted">Aún no hay lugares registrados.</td></tr>
+            @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="card-body">
+        <h3 class="mt-0">Agregar</h3>
+        <form method="POST" action="{{ route('configuracion.lugares.guardar') }}" class="form-grid cols-3">
+            @csrf
+            <div class="campo"><label>Tipo *</label><select class="input" name="tipo" required>@foreach (\App\Models\LugarDestino::TIPOS as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
+            <div class="campo"><label>Nombre *</label><input class="input" name="nombre" required maxlength="120" placeholder="Ej: Crematorio …"></div>
+            <div class="campo"><label>Comuna *</label><input class="input" name="comuna" required maxlength="60" value="Temuco"></div>
+            <div class="campo"><label>Dirección</label><input class="input" name="direccion" maxlength="120"></div>
+            <div class="campo"><label>Teléfono</label><input class="input" name="telefono" maxlength="30"></div>
+            <div class="campo"><label>Cercanía (orden)</label><input class="input" type="number" name="orden" min="0" max="999" value="50">
+                <div class="ayuda">Número menor = aparece más arriba (más cerca de Temuco).</div></div>
+            <div class="form-acciones full"><button class="btn btn-primary">Agregar a la lista</button></div>
+        </form>
+    </div>
+</div>
 @endsection

@@ -123,7 +123,7 @@
                         <div class="campo"><label>Misa / ceremonia (lugar)</label><input class="input" name="misa_lugar" value="{{ old('misa_lugar', $solicitud->misa_lugar) }}"></div>
                         <div class="campo"><label>Misa / ceremonia (hora)</label><input class="input" type="datetime-local" name="misa_hora" value="{{ old('misa_hora', $dt($solicitud->misa_hora)) }}">
                         <div class="ayuda">Dentro de los 3 días del servicio.</div>@error('misa_hora')<div class="error">{{ $message }}</div>@enderror</div>
-                        <div class="campo"><label>Cementerio o crematorio</label><input class="input" name="cementerio_crematorio" value="{{ old('cementerio_crematorio', $solicitud->cementerio_crematorio) }}"></div>
+                        <div class="campo"><label>Cementerio o crematorio</label>@include('partials.campo-destino', ['solicitud' => $solicitud])</div>
                         <div class="campo"><label>Hora de sepultura / cremación</label><input class="input" type="datetime-local" name="sepultura_hora" value="{{ old('sepultura_hora', $dt($solicitud->sepultura_hora)) }}">
                         <div class="ayuda">Dentro de los 3 días del servicio.</div>@error('sepultura_hora')<div class="error">{{ $message }}</div>@enderror</div>
                         <div class="campo"><label>Comuna de destino</label><input class="input" name="comuna_destino" value="{{ old('comuna_destino', $solicitud->comuna_destino) }}" placeholder="Temuco"></div>

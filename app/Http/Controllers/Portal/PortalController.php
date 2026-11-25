@@ -64,7 +64,13 @@ class PortalController extends Controller
             ], $u);
             $datos = $request->datosSolicitud() + ['cliente_id' => $cliente->id];
 
-            return $this->servicio->crear($datos, $u, $request->file('certificado'));
+            // La familia nunca queda bloqueada por un choque de horario: la solicitud se recibe igual,
+            // marcada "requiere apoyo externo", y la funeraria confirma la hora o coordina otra carroza.
+            if ($this->servicio->conflictoHorario($datos['fecha_hora'])) {
+                session()->flash('aviso', 'Ese horario coincide con otro servicio. La funeraria le confirmará la hora o coordinará una carroza de apoyo.');
+            }
+
+            return $this->servicio->crear($datos, $u, $request->file('certificado'), true);
         }, 'Su solicitud fue enviada. La funeraria la revisará y se comunicará con usted.', fn ($s) => route('portal.show', $s));
     }
 
@@ -89,7 +95,7 @@ class PortalController extends Controller
         abort_unless($solicitud->esEditablePorSolicitante(), 403);
 
         return $this->intentar(function () use ($request, $solicitud) {
-            $s = $this->servicio->actualizar($solicitud, $request->datosSolicitud(), $request->file('certificado'));
+            $s = $this->servicio->actualizar($solicitud, $request->datosSolicitud(), $request->file('certificado'), true);
             if ($s->estado === 'con_observaciones') {
                 $s->update(['estado' => 'en_revision']);
             }
