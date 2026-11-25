@@ -7,7 +7,7 @@
     <meta name="description" content="{{ config('funeraria.nombre') }} — servicios funerarios en Temuco y Padre Las Casas. Atención 24 horas.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
 <body class="publico">
 <div class="pub-top">
@@ -64,6 +64,6 @@
     </div>
 </footer>
 <a class="wa-flotante" href="{{ whatsapp_url(null, 'Hola, necesito información sobre un servicio funerario.') }}" target="_blank" rel="noopener">✆ WhatsApp</a>
-<script src="{{ asset('js/app.js') }}"></script>
+<script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}"></script>
 </body>
 </html>
