@@ -32,7 +32,7 @@ class PortalController extends Controller
 
         return view('portal.index', [
             'cliente' => $cliente,
-            'solicitudes' => $cliente ? $cliente->solicitudes()->with(['urna', 'contrato'])->latest()->get() : collect(),
+            'solicitudes' => $cliente ? $cliente->solicitudes()->with(['urna', 'unidad', 'contrato'])->latest()->get() : collect(),
             'resumen' => $cliente?->resumenPagos(),
         ]);
     }
@@ -72,7 +72,7 @@ class PortalController extends Controller
     {
         $this->autorizar($request, $solicitud);
 
-        return view('portal.show', ['s' => $solicitud->load(['urna', 'sucursal', 'contrato.abonos', 'asignacion', 'condolencias'])]);
+        return view('portal.show', ['s' => $solicitud->load(['urna', 'unidad', 'sucursal', 'contrato.abonos', 'asignacion', 'condolencias'])]);
     }
 
     public function edit(Request $request, Solicitud $solicitud)

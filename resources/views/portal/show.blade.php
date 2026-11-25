@@ -22,7 +22,7 @@
             <div class="ficha">
                 <div class="dato"><div class="k">Fecha y hora</div><div class="v">{{ fecha_hora($s->fecha_hora) }}</div></div>
                 <div class="dato"><div class="k">Servicio</div><div class="v">{{ $s->nombreServicio() }}</div></div>
-                <div class="dato"><div class="k">Urna</div><div class="v">{{ $s->urna?->modelo ?? 'Por definir' }}</div></div>
+                <div class="dato"><div class="k">Urna</div><div class="v">@include('portal._urna', ['s' => $s])</div></div>
                 <div class="dato"><div class="k">Sucursal</div><div class="v">{{ $s->sucursal->nombre }}</div></div>
                 <div class="dato"><div class="k">Destino final</div><div class="v">{{ etiqueta('destinos', $s->destino_final) }}</div></div>
                 <div class="dato"><div class="k">Velatorio</div><div class="v">{{ $s->lugar_velatorio ?: '—' }}</div></div>

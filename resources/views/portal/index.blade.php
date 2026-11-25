@@ -26,7 +26,7 @@
                     <td class="strong">{{ $s->nombre_fallecido }}</td>
                     <td>{{ $s->nombreServicio() }}</td>
                     <td class="nowrap">{{ fecha_hora($s->fecha_hora) }}</td>
-                    <td>{{ $s->urna?->modelo ?? 'Por definir' }}</td>
+                    <td>@include('portal._urna', ['s' => $s, 'corto' => true])</td>
                     <td><x-estado :valor="$s->estado" /></td>
                     <td class="nowrap">
                         <a href="{{ route('portal.show', $s) }}" class="btn btn-outline btn-xs">Ver</a>
