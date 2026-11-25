@@ -23,6 +23,7 @@ class AbonoController extends Controller
         $filtro = $request->query('filtro', 'vigentes');
         $contratos = Contrato::with(['solicitud.cliente', 'convenio', 'abonos'])
             ->when($filtro === 'vigentes', fn ($q) => $q->where('estado', 'vigente'))
+            ->when($filtro === 'pendientes', fn ($q) => $q->conSaldo()->reorder()->orderBy('fecha_vencimiento'))
             ->when($filtro === 'atrasados', fn ($q) => $q->atrasados())
             ->when($filtro === 'liquidados', fn ($q) => $q->where('estado', 'liquidado'))
             ->when($request->query('q'), fn ($q, $t) => $q->where(fn ($w) => $w->where('numero', 'like', "%{$t}%")
@@ -40,6 +41,10 @@ class AbonoController extends Controller
             'porConfirmar' => Abono::with(['contrato.solicitud.cliente', 'usuario'])->where('estado', 'pendiente')->oldest()->get(),
             'mes' => $this->mesValido($request->query('mes')),
             'filtro' => $filtro,
+            'conteos' => [
+                'pendientes' => Contrato::conSaldo()->count(),
+                'atrasados' => Contrato::atrasados()->count(),
+            ],
             'totales' => [
                 'por_cobrar' => (int) Contrato::conSaldo()->sum('saldo_pendiente'),
                 'atrasado' => (int) Contrato::atrasados()->sum('saldo_pendiente'),

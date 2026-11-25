@@ -47,8 +47,8 @@
 
 <div class="card">
     <div class="tabs">
-        @foreach (['vigentes' => 'Vigentes', 'atrasados' => 'Atrasados', 'liquidados' => 'Liquidados', 'todos' => 'Todos'] as $k => $v)
-            <a href="{{ route('abonos.index', ['filtro' => $k]) }}" class="{{ $filtro === $k ? 'activo' : '' }}">{{ $v }}</a>
+        @foreach (['vigentes' => 'Vigentes', 'pendientes' => 'Saldo pendiente', 'atrasados' => 'Atrasados', 'liquidados' => 'Liquidados', 'todos' => 'Todos'] as $k => $v)
+            <a href="{{ route('abonos.index', ['filtro' => $k]) }}" class="{{ $filtro === $k ? 'activo' : '' }}">{{ $v }}@if (isset($conteos[$k])) <span class="badge {{ $k === 'atrasados' && $conteos[$k] ? 'b-bad' : 'b-neutral' }}">{{ $conteos[$k] }}</span>@endif</a>
         @endforeach
         <form method="GET" class="flex" style="margin-left:auto;padding:6px 0">
             <input type="hidden" name="filtro" value="{{ $filtro }}">
