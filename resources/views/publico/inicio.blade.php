@@ -61,8 +61,8 @@
             <p class="muted">Sea el primero en dejar su opinión.</p>
         @endforelse
     </div>
-    <div class="card mt-3" style="max-width:640px">
-        <div class="card-header"><h2>Deje su opinión</h2></div>
+    <div class="card mt-3" style="max-width:640px" id="opinion">
+        <div class="card-header"><h2>Deje su opinión</h2>@if (session('opinion_enviada'))<span class="badge b-ok">✓ Opinión enviada</span>@endif</div>
         <div class="card-body">
             <form method="POST" action="{{ route('publico.opinion') }}">
                 @csrf

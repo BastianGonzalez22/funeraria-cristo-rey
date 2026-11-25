@@ -94,7 +94,8 @@ class SitioController extends Controller
         ]);
         Opinion::create($d + ['publicada' => false]);
 
-        return back()->with('ok', 'Gracias por su opinión. Será publicada después de ser revisada.');
+        // Aviso pequeño en el mismo recuadro del formulario (no en la parte superior de la página)
+        return redirect()->to(url()->previous().'#opinion')->with('opinion_enviada', true);
     }
 
     /** Página para compartir con familiares: velatorio, misa, traslado y condolencias. */
