@@ -44,6 +44,6 @@
 @if ($c->clausulas_adicionales)<p>5. {{ $c->clausulas_adicionales }}</p>@endif
 
 <table class="firma">
-    <tr><td><div class="linea"></div>{{ $cl->nombre_contratante }}<br>Contratante</td><td><div class="linea"></div>{{ config('funeraria.nombre') }}<br>Representante</td></tr>
+    <tr><td><div class="linea"></div>{{ $cl->nombre_contratante }}<br>Contratante</td><td>@include('pdf._firma', ['firmante' => 'Representante'])</td></tr>
 </table>
 </body></html>

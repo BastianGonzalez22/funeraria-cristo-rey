@@ -36,8 +36,9 @@
                                 <option value="efectivo">Depósito en efectivo</option>
                                 <option value="tarjeta">Pago con tarjeta (voucher)</option>
                             </select></div>
-                        <div class="campo"><label>N° de operación / comentario</label>
-                            <input class="input" name="referencia" value="{{ old('referencia') }}" maxlength="120" placeholder="Ej: 4587221"></div>
+                        <div class="campo"><label>N° de operación (opcional)</label>
+                            <input class="input" name="referencia" value="{{ old('referencia') }}" maxlength="120" placeholder="Ej: 4587221">
+                            <div class="ayuda">Número que entrega su banco al hacer la transferencia (aparece en el comprobante). No es su número de cuenta.</div></div>
                         <div class="campo full"><label>Comprobante (foto o PDF) *</label>
                             <input class="input" type="file" name="comprobante" accept=".pdf,.jpg,.jpeg,.png" required>
                             <div class="ayuda">Captura de pantalla de la transferencia o foto del depósito. Máx. 5 MB.</div></div>

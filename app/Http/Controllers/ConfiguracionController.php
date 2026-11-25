@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Storage;
 /** Imagen del login, imagen de portada y textos del sitio. */
 class ConfiguracionController extends Controller
 {
-    private const IMAGENES = ['login_imagen' => 'Imagen del ingreso al sistema', 'portada_imagen' => 'Imagen de portada del sitio'];
+    private const IMAGENES = [
+        'login_imagen' => 'Imagen del ingreso al sistema',
+        'portada_imagen' => 'Imagen de portada del sitio',
+        'firma_imagen' => 'Firma y timbre de los documentos PDF',
+    ];
 
     public function index()
     {
@@ -26,10 +30,11 @@ class ConfiguracionController extends Controller
         $request->validate([
             'login_imagen' => ['nullable', 'image', 'max:4096'],
             'portada_imagen' => ['nullable', 'image', 'max:4096'],
+            'firma_imagen' => ['nullable', 'image', 'max:2048'],
             'login_texto' => ['nullable', 'string', 'max:200'],
             'portada_titulo' => ['nullable', 'string', 'max:150'],
             'quitar' => ['nullable', 'array'],
-            'quitar.*' => ['in:login_imagen,portada_imagen'],
+            'quitar.*' => ['in:login_imagen,portada_imagen,firma_imagen'],
         ]);
 
         foreach (array_keys(self::IMAGENES) as $clave) {
@@ -44,7 +49,7 @@ class ConfiguracionController extends Controller
         if ($request->filled('quitar')) {
             AuditService::registrar('configuracion', 'Se eliminó la imagen: '.implode(', ', $request->input('quitar')));
 
-            return back()->with('ok', 'Imagen eliminada. Se volverá a mostrar el fondo oscuro por defecto.');
+            return back()->with('ok', 'Imagen eliminada.');
         }
         Ajuste::guardar('login_texto', $request->input('login_texto'));
         Ajuste::guardar('portada_titulo', $request->input('portada_titulo'));

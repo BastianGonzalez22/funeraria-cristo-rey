@@ -107,7 +107,7 @@ class AbonoController extends Controller
     public function comprobante(Abono $abono)
     {
         abort_unless($abono->numero_comprobante, 404, 'El comprobante se emite al confirmar el abono.');
-        $abono->load(['contrato.solicitud.cliente', 'contrato.solicitud.sucursal', 'usuario']);
+        $abono->load(['contrato.solicitud.cliente', 'contrato.solicitud.sucursal', 'usuario', 'confirmadoPor']);
         AuditService::registrar('comprobante_emitido', "Emisión del comprobante {$abono->numero_comprobante}", $abono->contrato);
 
         return Pdf::loadView('pdf.comprobante', ['abono' => $abono])

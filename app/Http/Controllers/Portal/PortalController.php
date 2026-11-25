@@ -138,7 +138,7 @@ class PortalController extends Controller
     {
         $this->autorizar($request, $abono->contrato->solicitud);
         abort_if($abono->estado !== 'registrado' && $abono->estado !== 'anulado', 404, 'El comprobante se emite cuando la funeraria confirma el abono.');
-        $abono->load(['contrato.solicitud.cliente', 'contrato.solicitud.sucursal', 'usuario']);
+        $abono->load(['contrato.solicitud.cliente', 'contrato.solicitud.sucursal', 'usuario', 'confirmadoPor']);
 
         return Pdf::loadView('pdf.comprobante', ['abono' => $abono])->stream("comprobante-{$abono->numero_comprobante}.pdf");
     }

@@ -21,6 +21,6 @@
 </table>
 
 <table class="firma">
-    <tr><td><div class="linea"></div>{{ $s->cliente->nombre_contratante }}</td><td><div class="linea"></div>{{ config('funeraria.nombre') }}</td></tr>
+    <tr><td><div class="linea"></div>{{ $s->cliente->nombre_contratante }}</td><td>@include('pdf._firma')</td></tr>
 </table>
 </body></html>
